@@ -10,8 +10,8 @@
             <v-list-item
                 v-for="game in games"
                 :key="game.id"
-                @click="selectGame(game.id)"
-                :active="game.id === selectedId"
+                @click="select_game(game.id)"
+                :active="game.id === selected_id"
                 :title="`Game ${game.id.slice(0, 8)}...`"
             >
                 <template #prepend>
@@ -25,7 +25,7 @@
 
         <!-- Action Buttons -->
         <v-list>
-            <v-list-item @click="openDialog = true">
+            <v-list-item @click="open_dialog = true">
                 <v-icon left>mdi-plus</v-icon>
                 Create Game
             </v-list-item>
@@ -37,12 +37,12 @@
         </v-list>
 
         <!-- Create Game Dialog -->
-        <v-dialog v-model="openDialog" max-width="400">
+        <v-dialog v-model="open_dialog" max-width="400">
             <v-card>
                 <v-card-title>Create New Game</v-card-title>
                 <v-card-text>
                     <v-text-field
-                        v-model="newGameName"
+                        v-model="new_game_name"
                         label="Game Name (optional)"
                     />
                     <v-text-field v-model="width" label="Width" type="number" />
@@ -54,8 +54,8 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn text @click="openDialog = false">Cancel</v-btn>
-                    <v-btn color="primary" @click="createGame">Create</v-btn>
+                    <v-btn text @click="open_dialog = false">Cancel</v-btn>
+                    <v-btn color="primary" @click="create_game">Create</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -63,28 +63,45 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useStore } from "vuex";
 
-const games = ref([
-    { id: "abc123", icon: "mdi-gamepad-variant" },
-    { id: "def456", icon: "mdi-gamepad-variant" },
-]);
+const store = useStore();
+const emit = defineEmits(["select-game"]);
 
-const selectedId = ref(null);
-const openDialog = ref(false);
-const newGameName = ref("");
-const width = ref(7);
-const height = ref(6);
+onMounted(async () => {
+    await store.dispatch("gameLoader/loadGames");
+    // Set the first game as selected if available - makes for a nicer first view experience
+    const games = Object.values(store.state.entities.games.data);
+    if (games.length > 0) {
+        const first_game = games[0];
+        selected_id.value = first_game.id;
+        emit("select-game", first_game.id);
+    }
+});
 
-function selectGame(id) {
-    selectedId.value = id;
-    // In a real app, you’d emit or update state here
+const games = computed(() =>
+    store.state.entities.games.data
+        ? Object.values(store.state.entities.games.data)
+        : []
+);
+
+const selected_id = ref(null);
+const open_dialog = ref(false);
+
+/**
+ * Emit the selected game when user clicks on it in the sidebar
+ * @param id id of the selected game
+ */
+function select_game(id) {
+    selected_id.value = id;
+    emit("select-game", id);
 }
 
-function createGame() {
+function create_game() {
     //TODO actual logic
     console.log("Creating game with", width.value, height.value);
-    openDialog.value = false;
+    open_dialog.value = false;
 }
 
 function logout() {
