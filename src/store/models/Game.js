@@ -7,6 +7,12 @@ export default class Game extends Model {
         return {
             id: this.string(null),
             jen: this.string(""),
+            start_time: this.attr(null), // ISO string assumed
+            end_time: this.attr(null), // null if unfinished
         };
+    }
+
+    get is_finished() {
+        return this.end_time !== null;
     }
 }

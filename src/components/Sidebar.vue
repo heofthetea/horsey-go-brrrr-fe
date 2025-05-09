@@ -67,12 +67,19 @@ import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+const emit = defineEmits(["select-game"]);
 
-onMounted(() => {
-    store.dispatch("gameLoader/loadGames");
+onMounted(async () => {
+    await store.dispatch("gameLoader/loadGames");
+    // Set the first game as selected if available - makes for a nicer first view experience
+    const games = Object.values(store.state.entities.games.data);
+    if (games.length > 0) {
+        const first_game = games[0];
+        selected_id.value = first_game.id;
+        emit("select-game", first_game.id);
+    }
 });
 
-console.log("sidebar.vue", store);
 const games = computed(() =>
     store.state.entities.games.data
         ? Object.values(store.state.entities.games.data)
@@ -82,9 +89,13 @@ const games = computed(() =>
 const selected_id = ref(null);
 const open_dialog = ref(false);
 
+/**
+ * Emit the selected game when user clicks on it in the sidebar
+ * @param id id of the selected game
+ */
 function select_game(id) {
     selected_id.value = id;
-    //TODO emit selection
+    emit("select-game", id);
 }
 
 function create_game() {

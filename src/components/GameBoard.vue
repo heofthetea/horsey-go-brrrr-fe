@@ -7,13 +7,14 @@
                     :key="ci"
                     class="cell"
                     :class="{
-                        clickable: getNextAvailableRow(ci) === ri,
+                        clickable: find_lowest_free_cell(ci) === ri,
                         hovered:
-                            hover_col === ci && getNextAvailableRow(ci) === ri,
+                            hover_col === ci &&
+                            find_lowest_free_cell(ci) === ri,
                     }"
                     @mouseenter="hover_col = ci"
                     @mouseleave="hover_col = null"
-                    @click="handleClick(ci)"
+                    @click="handle_click(ci)"
                 >
                     <!-- Actual token -->
                     <img v-if="cell === 'x'" :src="xSvg" class="mark" alt="x" />
@@ -27,7 +28,7 @@
                     <!-- Hover preview -->
                     <img
                         v-else-if="
-                            hover_col === ci && getNextAvailableRow(ci) === ri
+                            hover_col === ci && find_lowest_free_cell(ci) === ri
                         "
                         :src="parsed.current_player === 'x' ? xSvg : oSvg"
                         class="mark faint"
@@ -53,6 +54,11 @@ const props = defineProps({
 
 const hover_col = ref(null);
 
+/**
+ * Parses the JEN string into a format better suited for rendering.
+ * Inverts the array so that the top-left cell is rendered bottom-left.
+ * Also extracts the width, height, and current player.
+ */
 const parsed = computed(() => {
     const jen = props.jen;
     if (!jen || jen.length < 7) return null;
@@ -74,7 +80,11 @@ const parsed = computed(() => {
     return { width, height, current_player, board };
 });
 
-const getNextAvailableRow = (col) => {
+/**
+ * Find the lowest available cell in a given column
+ * @param col
+ */
+const find_lowest_free_cell = (col) => {
     if (!parsed.value) return null;
     const { height, board } = parsed.value;
     for (let r = height - 1; r >= 0; r--) {
@@ -83,8 +93,8 @@ const getNextAvailableRow = (col) => {
     return null; // column full
 };
 
-const handleClick = (col) => {
-    const row = getNextAvailableRow(col);
+const handle_click = (col) => {
+    const row = find_lowest_free_cell(col);
     if (row !== null) {
         console.log(
             `Placing ${parsed.value.current_player} at column ${col}, row ${row}`
