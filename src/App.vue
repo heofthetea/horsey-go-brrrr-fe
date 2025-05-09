@@ -4,7 +4,11 @@
 
         <v-main>
             <v-container fluid class="h-100 d-flex justify-center align-center">
-                <GameBoard v-if="selected_jen" :jen="selected_jen" />
+                <GameBoard
+                    v-if="selected_jen"
+                    :jen="selected_jen"
+                    :game-id="selected_game_id"
+                />
             </v-container>
         </v-main>
     </v-app>
@@ -22,7 +26,7 @@ const selected_game_id = ref(null);
 const selected_jen = computed(() => {
     if (!selected_game_id.value) return null;
     const game = store.state.entities.games.data[selected_game_id.value];
-    return game?.jen ?? null;
+    return game?.currentPosition ?? null;
 });
 
 function handle_game_select(id) {

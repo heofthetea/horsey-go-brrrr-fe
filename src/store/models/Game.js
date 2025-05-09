@@ -6,7 +6,7 @@ export default class Game extends Model {
     static fields() {
         return {
             id: this.string(null),
-            jen: this.string(""),
+            currentPosition: this.string(""),
             start_time: this.attr(null), // ISO string assumed
             end_time: this.attr(null), // null if unfinished
         };

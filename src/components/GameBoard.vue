@@ -26,6 +26,7 @@
                     />
 
                     <!-- Hover preview -->
+
                     <img
                         v-else-if="
                             hover_col === ci && find_lowest_free_cell(ci) === ri
@@ -42,6 +43,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
 
@@ -50,9 +52,16 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    gameId: {
+        type: String,
+        required: true,
+    },
 });
 
+const store = useStore();
 const hover_col = ref(null);
+
+const username = import.meta.env.VITE_HARDCODED_USERNAME;
 
 /**
  * Parses the JEN string into a format better suited for rendering.
@@ -67,6 +76,7 @@ const parsed = computed(() => {
     const height = parseInt(jen.slice(3, 6), 10);
     const current_player = jen[6];
     const board_string = jen.slice(7);
+    console.log(props.jen, current_player);
 
     if (board_string.length !== width * height) return null;
 
@@ -80,10 +90,6 @@ const parsed = computed(() => {
     return { width, height, current_player, board };
 });
 
-/**
- * Find the lowest available cell in a given column
- * @param col
- */
 const find_lowest_free_cell = (col) => {
     if (!parsed.value) return null;
     const { height, board } = parsed.value;
@@ -93,12 +99,18 @@ const find_lowest_free_cell = (col) => {
     return null; // column full
 };
 
-const handle_click = (col) => {
+const handle_click = async (col) => {
     const row = find_lowest_free_cell(col);
-    if (row !== null) {
-        console.log(
-            `Placing ${parsed.value.current_player} at column ${col}, row ${row}`
-        );
+    if (row === null) return;
+
+    try {
+        await store.dispatch("gameLoader/makeTurn", {
+            game_id: props.gameId,
+            username,
+            column: col,
+        });
+    } catch (err) {
+        console.error("Failed to make move:", err);
     }
 };
 </script>
