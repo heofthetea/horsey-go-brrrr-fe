@@ -3,8 +3,8 @@
         <Sidebar />
 
         <v-main>
-            <v-container fluid>
-                <GameBoard :jen="demoJen" />
+            <v-container fluid class="h-100 d-flex justify-center align-center">
+                <GameBoard :jen="demoJen2" />
             </v-container>
         </v-main>
     </v-app>
@@ -14,6 +14,8 @@
 import Sidebar from "./components/Sidebar.vue";
 import GameBoard from "./components/GameBoard.vue";
 
-// Example JEN string from your documentation
-const demoJen = "004003o-xox--xo----";
+const demoJen2 =
+    "009009ox-o------x-o------x-o------x-----------------------------------------------------";
 </script>
+
+<style></style>
