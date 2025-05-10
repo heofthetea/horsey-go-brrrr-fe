@@ -3,11 +3,9 @@ import api from "@/services/api";
 
 export async function get_games_by_user(username) {
     const response = await api.get(`/games`, { params: { username } });
-    console.log(response.data);
     if (!response.status === 200) {
         throw new Error("Failed to fetch games", response.status);
     }
-    console.log(response.data);
     return response.data;
 }
 /**
@@ -40,7 +38,6 @@ export async function make_turn(game_id, username, column) {
     if (!response.status === 200) {
         throw new Error("Failed to make turn", response.status);
     }
-    console.log(response.data);
     return response.data;
 }
 
