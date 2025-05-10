@@ -90,16 +90,16 @@ const parsed = computed(() => {
     return { width, height, current_player, board };
 });
 
-const find_lowest_free_cell = (col) => {
+function find_lowest_free_cell(col) {
     if (!parsed.value) return null;
     const { height, board } = parsed.value;
     for (let r = height - 1; r >= 0; r--) {
         if (board[r][col] === "-") return r;
     }
     return null; // column full
-};
+}
 
-const handle_click = async (col) => {
+async function handle_click(col) {
     const row = find_lowest_free_cell(col);
     if (row === null) return;
 
@@ -112,7 +112,7 @@ const handle_click = async (col) => {
     } catch (err) {
         console.error("Failed to make move:", err);
     }
-};
+}
 </script>
 
 <style scoped>

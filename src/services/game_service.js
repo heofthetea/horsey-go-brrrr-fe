@@ -43,3 +43,20 @@ export async function make_turn(game_id, username, column) {
     console.log(response.data);
     return response.data;
 }
+
+export async function get_game(game_id) {
+    const response = await api.get(`/games/${game_id}`);
+    if (!response.status === 200) {
+        throw new Error("Failed to fetch game", response.status);
+    }
+    return response.data;
+}
+
+export async function join_game(game_id, username) {
+    const payload = { username };
+    const response = await api.put(`/games/${game_id}/join`, payload);
+    if (!response.status === 200) {
+        throw new Error("Failed to join game", response.status);
+    }
+    return response.data;
+}
