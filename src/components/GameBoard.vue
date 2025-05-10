@@ -1,5 +1,22 @@
 <template>
-    <v-container class="pa-4 d-flex justify-center" fluid>
+    <v-container
+        class="pa-4 d-flex flex-column"
+        style="width: fit-content"
+        fluid
+    >
+        <!-- Player X -->
+        <div class="font-weight-bold mb-2">x: {{ host }}</div>
+        <!-- Banner -->
+        <v-alert
+            v-if="isGameOver && !dismissedBanner"
+            type="info"
+            close-label="Close"
+            closable
+            @click:close="dismissedBanner = true"
+            class="mb-2 alert-banner"
+        >
+            {{ resultText }}
+        </v-alert>
         <div class="board">
             <div v-for="(row, ri) in parsed.board" :key="ri" class="board-row">
                 <div
@@ -7,14 +24,16 @@
                     :key="ci"
                     class="cell"
                     :class="{
-                        clickable: find_lowest_free_cell(ci) === ri,
+                        clickable:
+                            find_lowest_free_cell(ci) === ri && !isGameOver,
                         hovered:
                             hover_col === ci &&
-                            find_lowest_free_cell(ci) === ri,
+                            find_lowest_free_cell(ci) === ri &&
+                            !isGameOver,
                     }"
-                    @mouseenter="hover_col = ci"
+                    @mouseenter="!isGameOver && (hover_col = ci)"
                     @mouseleave="hover_col = null"
-                    @click="handle_click(ci)"
+                    @click="!isGameOver && handle_click(ci)"
                 >
                     <!-- Actual token -->
                     <img v-if="cell === 'x'" :src="xSvg" class="mark" alt="x" />
@@ -38,6 +57,8 @@
                 </div>
             </div>
         </div>
+        <!-- Player O -->
+        <div class="font-weight-bold mt-2">o: {{ guest }}</div>
     </v-container>
 </template>
 
@@ -48,18 +69,25 @@ import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
 
 const props = defineProps({
-    jen: {
-        type: String,
-        required: true,
-    },
-    gameId: {
-        type: String,
+    game: {
+        type: Object,
         required: true,
     },
 });
 
 const store = useStore();
 const hover_col = ref(null);
+const dismissedBanner = ref(false);
+
+const state = computed(() => props.game.state);
+const host = computed(() => props.game.host.username);
+const guest = computed(
+    () => props.game.guest?.guest?.username ?? "Waiting for players to join..."
+);
+
+const isGameOver = computed(() =>
+    ["HOST_WON", "GUEST_WON", "DRAW"].includes(state.value)
+);
 
 const username = import.meta.env.VITE_HARDCODED_USERNAME;
 
@@ -69,14 +97,14 @@ const username = import.meta.env.VITE_HARDCODED_USERNAME;
  * Also extracts the width, height, and current player.
  */
 const parsed = computed(() => {
-    const jen = props.jen;
+    const jen = props.game.currentPosition;
     if (!jen || jen.length < 7) return null;
 
     const width = parseInt(jen.slice(0, 3), 10);
     const height = parseInt(jen.slice(3, 6), 10);
     const current_player = jen[6];
     const board_string = jen.slice(7);
-    console.log(props.jen, current_player);
+    console.log(props.game.currentPosition, current_player);
 
     if (board_string.length !== width * height) return null;
 
@@ -88,6 +116,19 @@ const parsed = computed(() => {
     }
 
     return { width, height, current_player, board };
+});
+
+const resultText = computed(() => {
+    switch (state.value) {
+        case "HOST_WON":
+            return "x won!";
+        case "GUEST_WON":
+            return "o won!";
+        case "DRAW":
+            return "Draw!";
+        default:
+            return "";
+    }
 });
 
 function find_lowest_free_cell(col) {
@@ -105,7 +146,7 @@ async function handle_click(col) {
 
     try {
         await store.dispatch("gameLoader/makeTurn", {
-            game_id: props.gameId,
+            game_id: props.game.id,
             username,
             column: col,
         });
@@ -119,10 +160,12 @@ async function handle_click(col) {
 .board {
     display: flex;
     flex-direction: column;
+    width: fit-content;
 }
 
 .board-row {
     display: flex;
+    justify-content: center;
 }
 
 .cell {
@@ -151,5 +194,13 @@ async function handle_click(col) {
 
 .faint {
     opacity: 0.3;
+}
+.alert-banner {
+    position: sticky;
+    text-align: center;
+    top: 40%;
+    height: fit-content;
+    margin: -4.5rem auto; /*everytime you do literally ANYTHING with css it ends up being the worst Pfusch the world has ever seen i swear */
+    width: 100%;
 }
 </style>

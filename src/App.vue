@@ -13,11 +13,7 @@
                 </v-alert>
             </div>
             <v-container fluid class="h-100 d-flex justify-center align-center">
-                <GameBoard
-                    v-if="selected_game"
-                    :jen="selected_game?.currentPosition ?? null"
-                    :game-id="selected_game_id"
-                />
+                <GameBoard v-if="selected_game" :game="selected_game" />
             </v-container>
         </v-main>
     </v-app>

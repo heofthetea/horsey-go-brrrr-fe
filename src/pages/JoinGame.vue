@@ -1,8 +1,4 @@
-<template>
-    <v-container>
-        <h2>Hello world</h2>
-    </v-container>
-</template>
+<template>Make team 2 great again</template>
 
 <script setup>
 import { onMounted } from "vue";
@@ -25,7 +21,6 @@ onMounted(async () => {
         router.push({ path: "/", query: { select: game_id } });
     } catch (err) {
         console.error("Error joining game:", err);
-        // Optionally redirect or show error
     }
 });
 </script>
