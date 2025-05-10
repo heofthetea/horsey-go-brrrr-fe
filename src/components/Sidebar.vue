@@ -42,14 +42,16 @@
                 <v-card-title>Create New Game</v-card-title>
                 <v-card-text>
                     <v-text-field
-                        v-model="new_game_name"
-                        label="Game Name (optional)"
+                        v-model="width"
+                        label="Width"
+                        type="number"
+                        required
                     />
-                    <v-text-field v-model="width" label="Width" type="number" />
                     <v-text-field
                         v-model="height"
                         label="Height"
                         type="number"
+                        required
                     />
                 </v-card-text>
                 <v-card-actions>
@@ -67,6 +69,8 @@ import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+const width = ref(null);
+const height = ref(null);
 const emit = defineEmits(["select-game"]);
 
 onMounted(async () => {
@@ -98,9 +102,15 @@ function select_game(id) {
     emit("select-game", id);
 }
 
-function create_game() {
-    //TODO actual logic
-    console.log("Creating game with", width.value, height.value);
+async function create_game() {
+    const game = await store.dispatch("gameLoader/createGame", {
+        username: import.meta.env.VITE_HARDCODED_USERNAME, //TODO do not hardcode
+        width: width.value,
+        height: height.value,
+    });
+
+    selected_id.value = game.id;
+    emit("select-game", game.id);
     open_dialog.value = false;
 }
 

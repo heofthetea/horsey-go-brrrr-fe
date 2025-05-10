@@ -1,21 +1,62 @@
-//TODO mock-implementation - finalize
+// API communication for game
+import api from "@/services/api";
 
-const mock_games = [
-    {
-        id: "game1",
-        jen: "004003o-xox--xo----",
-        start_time: "2024-05-01T12:00:00Z",
-        end_time: null,
-    },
-    {
-        id: "game2",
-        jen: "009009xx-o------x-o------x-o------------------------------------------------------------",
-        start_time: "2024-04-25T10:00:00Z",
-        end_time: "2024-04-25T11:00:00Z",
-    },
-];
+export async function get_games_by_user(username) {
+    const response = await api.get(`/games`, { params: { username } });
+    console.log(response.data);
+    if (!response.status === 200) {
+        throw new Error("Failed to fetch games", response.status);
+    }
+    console.log(response.data);
+    return response.data;
+}
+/**
+ * Create a new game for the given player.
+ * @param {string} username - The username of the host player.
+ * @param {number} width - Width of the board.
+ * @param {number} height - Height of the board.
+ * @returns {Promise<Object>} The created game object.
+ */
+export async function create_game(username, width, height) {
+    const payload = {
+        host: { username },
+        width,
+        height,
+        state: "NOT_STARTED", // Must be included as string
+    };
 
-export async function get_games_by_user(user_id) {
-    console.log("get_games_by_user", user_id);
-    return mock_games;
+    const response = await api.post("/games/create", payload);
+    return response.data;
+}
+
+export async function make_turn(game_id, username, column) {
+    const payload = {
+        user: { username },
+        column,
+    };
+    console.log(payload);
+
+    const response = await api.put(`/games/${game_id}/make-turn`, payload);
+    if (!response.status === 200) {
+        throw new Error("Failed to make turn", response.status);
+    }
+    console.log(response.data);
+    return response.data;
+}
+
+export async function get_game(game_id) {
+    const response = await api.get(`/games/${game_id}`);
+    if (!response.status === 200) {
+        throw new Error("Failed to fetch game", response.status);
+    }
+    return response.data;
+}
+
+export async function join_game(game_id, username) {
+    const payload = { username };
+    const response = await api.put(`/games/${game_id}/join`, payload);
+    if (!response.status === 200) {
+        throw new Error("Failed to join game", response.status);
+    }
+    return response.data;
 }
