@@ -26,8 +26,10 @@ export function connectToSocket(gameId) {
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
-
-            if (message.type === "GAME_UPDATED" && message.game) {
+            if (
+                ["GAME_UPDATED", "GUEST_JOINED"].includes(message.type) &&
+                message.game
+            ) {
                 console.log(`[WS] Received game update from ${message.turnBy}`);
                 store.dispatch("gameLoader/insertGame", message.game);
             }
