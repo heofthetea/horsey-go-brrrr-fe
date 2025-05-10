@@ -25,6 +25,7 @@ import { useStore } from "vuex";
 import Sidebar from "./components/Sidebar.vue";
 import GameBoard from "./components/GameBoard.vue";
 import { useRoute } from "vue-router";
+import { connectToSocket } from "./services/socket_client";
 
 const store = useStore();
 const route = useRoute();
@@ -49,6 +50,7 @@ onMounted(() => {
 
 function handle_game_select(id) {
     selected_game_id.value = id;
+    connectToSocket(id);
 }
 </script>
 

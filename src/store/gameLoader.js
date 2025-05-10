@@ -34,10 +34,12 @@ export default {
             return game;
         },
         async joinGame(_, { game_id, username }) {
-            console.log("Joining game", game_id, username);
             const joined = await join_game(game_id, username);
             Game.insert({ data: joined });
             return joined;
+        },
+        async insertGame(_, game) {
+            Game.insert({ data: game });
         },
     },
 };
