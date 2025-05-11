@@ -86,9 +86,15 @@ const hover_col = ref(null);
 const dismissedBanner = ref(false);
 
 const state = computed(() => props.game.state);
-const host = computed(() => props.game.host.username);
+const host = computed(
+    () =>
+        props.game.host.username +
+        (props.game.host.username === username ? " (you)" : "")
+);
 const guest = computed(
-    () => props.game.guest?.username ?? "Waiting for players to join..."
+    () =>
+        (props.game.guest?.username ?? "Waiting for players to join...") +
+        (props.game.guest?.username === username ? " (you)" : "")
 );
 
 const isGameOver = computed(() =>
