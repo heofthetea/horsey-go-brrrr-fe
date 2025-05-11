@@ -1,5 +1,11 @@
 <template>
-    <v-navigation-drawer app permanent width="300">
+    <v-navigation-drawer
+        v-model="drawer"
+        :temporary="$vuetify.display.smAndDown"
+        mobile-breakpoint="960"
+        app
+        width="300"
+    >
         <!-- Title -->
         <v-toolbar flat>
             <v-toolbar-title>My Games</v-toolbar-title>
@@ -12,11 +18,8 @@
                 :key="game.id"
                 @click="select_game(game.id)"
                 :active="game.id === selected_id"
-                :title="`Game ${game.id.slice(0, 8)}...`"
+                :title="`${game.id}`"
             >
-                <template #prepend>
-                    <v-icon>{{ game.icon }}</v-icon>
-                </template>
             </v-list-item>
         </v-list>
 
@@ -65,14 +68,31 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useStore } from "vuex";
-import keycloak, { getUsername } from "../plugins/keycloak";
+import keycloak, { getUsername } from "@/plugins/keycloak";
 
 const store = useStore();
 const width = ref(null);
 const height = ref(null);
-const emit = defineEmits(["select-game"]);
+const drawer = ref(true);
+const emit = defineEmits(["select-game", "update:modelValue"]);
+
+const props = defineProps({
+    modelValue: {
+        type: Boolean,
+        required: true,
+    },
+});
+
+watch(
+    () => drawer.value,
+    (val) => emit("update:modelValue", val)
+);
+watch(
+    () => props.modelValue,
+    (val) => (drawer.value = val)
+);
 
 onMounted(async () => {
     await store.dispatch("gameLoader/loadGames");

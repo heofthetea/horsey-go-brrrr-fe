@@ -12,6 +12,7 @@ export default class Game extends Model {
             state: this.string("NOT_STARTED"), // see backend for possible values
             start_time: this.attr(null), // ISO string assumed
             end_time: this.attr(null), // null if unfinished
+            lastTurnIn: this.number(-1), // -1 <=> beginning of the game; no turns yet
         };
     }
 

@@ -39,6 +39,7 @@ export default {
         },
         async insertGame(_, game) {
             Game.insert({ data: game });
+            console.log("insert game", game);
         },
     },
 };

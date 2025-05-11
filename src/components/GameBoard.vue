@@ -33,12 +33,22 @@
                             find_lowest_free_cell(ci) === ri &&
                             is_my_turn &&
                             !isGameOver,
+                        lastTurn: lastTurnInY === ri && lastTurnIn === ci,
+                        winning:
+                            is_winning_coordinate(
+                                ci,
+                                parsed.board.length - 1 - ri
+                            ) && did_I_win,
+                        losing:
+                            is_winning_coordinate(
+                                ci,
+                                parsed.board.length - 1 - ri
+                            ) && !did_I_win,
                     }"
                     @mouseenter="!isGameOver && (hover_col = ci)"
                     @mouseleave="hover_col = null"
                     @click="!isGameOver && handle_click(ci)"
                 >
-                    <!-- Actual token -->
                     <img v-if="cell === 'x'" :src="xSvg" class="mark" alt="x" />
                     <img
                         v-else-if="cell === 'o'"
@@ -46,8 +56,6 @@
                         class="mark"
                         alt="o"
                     />
-
-                    <!-- Hover preview -->
 
                     <img
                         v-else-if="
@@ -73,6 +81,7 @@ import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
 import { getUsername } from "../plugins/keycloak";
+import getWinningCoordinates from "../utils/jenWinDetection";
 
 const props = defineProps({
     game: {
@@ -101,6 +110,37 @@ const isGameOver = computed(() =>
     ["HOST_WON", "GUEST_WON", "DRAW"].includes(state.value)
 );
 
+const is_my_turn = computed(() => {
+    if (props.game.guest === null) return false;
+    if (props.game.guest.username === username) {
+        return parsed.value.current_player === "o";
+    } else {
+        return parsed.value.current_player === "x";
+    }
+});
+
+const did_I_win = computed(() => {
+    if (props.game.guest === null) return false;
+    if (props.game.guest.username === username) {
+        return state.value === "GUEST_WON";
+    } else {
+        return state.value === "HOST_WON";
+    }
+});
+
+const lastTurnIn = computed(() => props.game.lastTurnIn);
+const lastTurnInY = computed(() => {
+    if (lastTurnIn.value == -1 || !parsed.value) return null;
+    return find_lowest_free_cell(lastTurnIn.value) + 1;
+});
+
+const winningCoordinates = computed(() => {
+    if (!isGameOver.value) return null;
+    return getWinningCoordinates(
+        props.game.currentPosition,
+        state.value === "HOST_WON" ? "x" : "o"
+    );
+});
 const username = getUsername();
 
 /**
@@ -151,14 +191,17 @@ function find_lowest_free_cell(col) {
     return null; // column full
 }
 
-const is_my_turn = computed(() => {
-    if (props.game.guest === null) return false;
-    if (props.game.guest.username === username) {
-        return parsed.value.current_player === "o";
-    } else {
-        return parsed.value.current_player === "x";
-    }
-});
+function is_winning_coordinate(x, y) {
+    if (!winningCoordinates.value) return false;
+    console.log(
+        winningCoordinates.value.some(
+            (coord) => coord["x"] === x && coord["y"] === y
+        )
+    );
+    return winningCoordinates.value.some(
+        (coord) => coord["x"] === x && coord["y"] === y
+    );
+}
 
 async function handle_click(col) {
     const row = find_lowest_free_cell(col);
@@ -207,9 +250,21 @@ async function handle_click(col) {
     background-color: #b3ddc5;
 }
 
+.cell.lastTurn {
+    background-color: lightblue;
+}
+.cell.winning {
+    background-color: lightgreen;
+}
+
+.cell.losing {
+    background-color: lightcoral;
+}
+
 .mark {
     width: 80%;
     height: 80%;
+    stroke: red !important;
 }
 
 .faint {
