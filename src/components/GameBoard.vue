@@ -25,10 +25,13 @@
                     class="cell"
                     :class="{
                         clickable:
-                            find_lowest_free_cell(ci) === ri && !isGameOver,
+                            find_lowest_free_cell(ci) === ri &&
+                            is_my_turn &&
+                            !isGameOver,
                         hovered:
                             hover_col === ci &&
                             find_lowest_free_cell(ci) === ri &&
+                            is_my_turn &&
                             !isGameOver,
                     }"
                     @mouseenter="!isGameOver && (hover_col = ci)"
@@ -48,7 +51,9 @@
 
                     <img
                         v-else-if="
-                            hover_col === ci && find_lowest_free_cell(ci) === ri
+                            hover_col === ci &&
+                            find_lowest_free_cell(ci) === ri &&
+                            is_my_turn
                         "
                         :src="parsed.current_player === 'x' ? xSvg : oSvg"
                         class="mark faint"
@@ -67,6 +72,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
+import { getUsername } from "../plugins/keycloak";
 
 const props = defineProps({
     game: {
@@ -80,16 +86,22 @@ const hover_col = ref(null);
 const dismissedBanner = ref(false);
 
 const state = computed(() => props.game.state);
-const host = computed(() => props.game.host.username);
+const host = computed(
+    () =>
+        props.game.host.username +
+        (props.game.host.username === username ? " (you)" : "")
+);
 const guest = computed(
-    () => props.game.guest?.guest?.username ?? "Waiting for players to join..."
+    () =>
+        (props.game.guest?.username ?? "Waiting for players to join...") +
+        (props.game.guest?.username === username ? " (you)" : "")
 );
 
 const isGameOver = computed(() =>
     ["HOST_WON", "GUEST_WON", "DRAW"].includes(state.value)
 );
 
-const username = import.meta.env.VITE_HARDCODED_USERNAME;
+const username = getUsername();
 
 /**
  * Parses the JEN string into a format better suited for rendering.
@@ -104,7 +116,6 @@ const parsed = computed(() => {
     const height = parseInt(jen.slice(3, 6), 10);
     const current_player = jen[6];
     const board_string = jen.slice(7);
-    console.log(props.game.currentPosition, current_player);
 
     if (board_string.length !== width * height) return null;
 
@@ -139,6 +150,15 @@ function find_lowest_free_cell(col) {
     }
     return null; // column full
 }
+
+const is_my_turn = computed(() => {
+    if (props.game.guest === null) return false;
+    if (props.game.guest.username === username) {
+        return parsed.value.current_player === "o";
+    } else {
+        return parsed.value.current_player === "x";
+    }
+});
 
 async function handle_click(col) {
     const row = find_lowest_free_cell(col);

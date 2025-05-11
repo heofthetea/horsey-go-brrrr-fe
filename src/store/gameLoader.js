@@ -6,14 +6,13 @@ import {
     join_game,
 } from "@/services/game_service";
 import Game from "@/store/models/Game";
+import { getUsername } from "../plugins/keycloak";
 
 export default {
     namespaced: true,
     actions: {
         async loadGames({ commit }) {
-            const games = await get_games_by_user(
-                import.meta.env.VITE_HARDCODED_USERNAME
-            );
+            const games = await get_games_by_user(getUsername());
             Game.insert({ data: games });
         },
 
