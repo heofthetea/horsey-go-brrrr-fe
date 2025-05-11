@@ -11,7 +11,7 @@ import { getUsername } from "../plugins/keycloak";
 export default {
     namespaced: true,
     actions: {
-        async loadGames({ commit }) {
+        async loadGames(_) {
             const games = await get_games_by_user(getUsername());
             Game.insert({ data: games });
         },
@@ -39,7 +39,6 @@ export default {
         },
         async insertGame(_, game) {
             Game.insert({ data: game });
-            console.log("insert game", game);
         },
     },
 };

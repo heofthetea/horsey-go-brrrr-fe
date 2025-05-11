@@ -193,11 +193,6 @@ function find_lowest_free_cell(col) {
 
 function is_winning_coordinate(x, y) {
     if (!winningCoordinates.value) return false;
-    console.log(
-        winningCoordinates.value.some(
-            (coord) => coord["x"] === x && coord["y"] === y
-        )
-    );
     return winningCoordinates.value.some(
         (coord) => coord["x"] === x && coord["y"] === y
     );
