@@ -12,6 +12,15 @@
                     <code>{{ join_link }}</code>
                 </v-alert>
             </div>
+            <v-alert
+                v-if="errorMessage"
+                type="error"
+                variant="tonal"
+                style="height: fit-content"
+                closable
+            >
+                {{ errorMessage }}
+            </v-alert>
             <v-container fluid class="h-100 d-flex justify-center align-center">
                 <GameBoard v-if="selected_game" :game="selected_game" />
             </v-container>
@@ -26,10 +35,15 @@ import Sidebar from "./components/Sidebar.vue";
 import GameBoard from "./components/GameBoard.vue";
 import { useRoute } from "vue-router";
 import { connectToSocket } from "./services/socket_client";
+import { getUsername } from "./plugins/keycloak";
 
 const store = useStore();
 const route = useRoute();
 const selected_game_id = ref(null);
+const errorMessage = computed(() => {
+    return route.query.errorMessage;
+});
+console.log("whoami", getUsername());
 
 const selected_game = computed(() => {
     if (!selected_game_id.value) return null;
@@ -42,6 +56,10 @@ const join_link = computed(() => {
 });
 
 onMounted(() => {
+    if (route.query.errorMessage) {
+        console.log(errorMessage);
+        return;
+    }
     const game_id = route.query.select;
     if (game_id) {
         selected_game_id.value = game_id;

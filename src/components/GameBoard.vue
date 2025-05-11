@@ -67,6 +67,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
+import { getUsername } from "../plugins/keycloak";
 
 const props = defineProps({
     game: {
@@ -89,7 +90,7 @@ const isGameOver = computed(() =>
     ["HOST_WON", "GUEST_WON", "DRAW"].includes(state.value)
 );
 
-const username = import.meta.env.VITE_HARDCODED_USERNAME;
+const username = getUsername();
 
 /**
  * Parses the JEN string into a format better suited for rendering.

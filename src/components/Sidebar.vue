@@ -67,6 +67,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import keycloak, { getUsername } from "../plugins/keycloak";
 
 const store = useStore();
 const width = ref(null);
@@ -104,7 +105,7 @@ function select_game(id) {
 
 async function create_game() {
     const game = await store.dispatch("gameLoader/createGame", {
-        username: import.meta.env.VITE_HARDCODED_USERNAME, //TODO do not hardcode
+        username: getUsername(),
         width: width.value,
         height: height.value,
     });
@@ -115,7 +116,6 @@ async function create_game() {
 }
 
 function logout() {
-    //TODO actual logic
-    console.log("Logging out...");
+    keycloak.logout();
 }
 </script>
