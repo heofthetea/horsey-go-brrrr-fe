@@ -7,3 +7,6 @@ Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://
 ## Environment Variables
 
 -   `API_BASE_URL`: base url of horsey-go-brrrr-be REST api
+-   `KEYCLOAK_URL`: base url of the keycloak
+-   `KEYCLOAK_REALM`: the kecloak realm
+-   `KEYCLOAK_CLIENT_ID`: the keycloak client id. Client should be configured as public.

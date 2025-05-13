@@ -10,6 +10,7 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const username = getUsername();
+console.log(router);
 
 onMounted(async () => {
     const game_id = route.params.gameId;
