@@ -6,6 +6,8 @@ const connections = new Map(); // maps gameId => WebSocket
 
 /**
  * Connect to a WebSocket server for the given gameId.
+ * Defines standard WebSocket callbacks for onopen, onmessage, onerror, and onclose.
+ * Incoming messages lead to an update of the orm store.
  * @param {*} gameId
  * @returns
  */
@@ -31,8 +33,13 @@ export function connectToSocket(gameId) {
                 ["GAME_UPDATED", "GUEST_JOINED"].includes(message.type) &&
                 message.game
             ) {
-                console.log(`[WS] Received game update from ${message.turnBy}`);
-                store.dispatch("gameLoader/insertGame", message.game);
+                console.log(
+                    `[WS] Received game update from ${message.turnBy}: ${message.turnIn}`
+                );
+                store.dispatch("gameLoader/insertGame", {
+                    ...message.game,
+                    lastTurnIn: message.turnIn,
+                });
             }
         } catch (err) {
             console.error("[WS] Failed to handle message:", err);

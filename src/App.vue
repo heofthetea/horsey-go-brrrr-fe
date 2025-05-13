@@ -1,6 +1,16 @@
 <template>
     <v-app>
-        <Sidebar @select-game="handle_game_select" />
+        <v-app-bar app>
+            <v-app-bar-nav-icon
+                @click="showSidebar = !showSidebar"
+                v-if="$vuetify.display.smAndDown"
+            />
+            <v-toolbar-title
+                >horsey-go-brrr - beat Josia edition</v-toolbar-title
+            >
+        </v-app-bar>
+
+        <Sidebar v-model="showSidebar" @select-game="handle_game_select" />
 
         <v-main>
             <div
@@ -35,15 +45,15 @@ import Sidebar from "./components/Sidebar.vue";
 import GameBoard from "./components/GameBoard.vue";
 import { useRoute } from "vue-router";
 import { connectToSocket } from "./services/socket_client";
-import { getUsername } from "./plugins/keycloak";
 
 const store = useStore();
 const route = useRoute();
 const selected_game_id = ref(null);
+const showSidebar = ref(true);
+
 const errorMessage = computed(() => {
     return route.query.errorMessage;
 });
-console.log("whoami", getUsername());
 
 const selected_game = computed(() => {
     if (!selected_game_id.value) return null;
@@ -57,7 +67,7 @@ const join_link = computed(() => {
 
 onMounted(() => {
     if (route.query.errorMessage) {
-        console.log(errorMessage);
+        console.error(errorMessage);
         return;
     }
     const game_id = route.query.select;

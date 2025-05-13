@@ -11,7 +11,6 @@ export const keycloakGuard = async (to, from, next) => {
             next();
         } else {
             keycloak.login();
-            console.log("logged in");
         }
     } catch (error) {
         console.error("Keycloak authentication error:", error);

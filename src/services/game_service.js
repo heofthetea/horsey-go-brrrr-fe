@@ -32,7 +32,6 @@ export async function make_turn(game_id, username, column) {
         user: { username },
         column,
     };
-    console.log(payload);
 
     const response = await api.put(`/games/${game_id}/make-turn`, payload);
     if (!response.status === 200) {
