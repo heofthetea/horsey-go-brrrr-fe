@@ -16,10 +16,7 @@ export function connectToSocket(gameId) {
         return; // already connected
     }
 
-    const url = `${import.meta.env.VITE_API_BASE_URL.replace(
-        /^http/,
-        "ws"
-    )}/ws/game/${gameId}`;
+    const url = `${import.meta.env.VITE_WEBSOCKET_URL}/game/${gameId}`;
     // shouldn't need to refresh the token here
     const ws = new WebSocket(url, ["access_token", keycloak.token]);
 
