@@ -1,6 +1,6 @@
 import store from "@/store";
 import Game from "@/store/models/Game";
-import { getToken } from "../plugins/keycloak";
+import keycloak from "../plugins/keycloak";
 
 const connections = new Map(); // maps gameId => WebSocket
 
@@ -20,7 +20,8 @@ export function connectToSocket(gameId) {
         /^http/,
         "ws"
     )}/ws/game/${gameId}`;
-    const ws = new WebSocket(url, ["access_token", getToken()]);
+    // shouldn't need to refresh the token here
+    const ws = new WebSocket(url, ["access_token", keycloak.token]);
 
     ws.onopen = () => {
         console.log(`[WS] Connected to game ${gameId}`);
