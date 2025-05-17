@@ -227,8 +227,14 @@ async function handle_click(col) {
 }
 
 .cell {
-    width: 50px;
-    height: 50px;
+    width: min(
+        calc(80vw / v-bind("parsed.width")),
+        calc(80vh / v-bind("parsed.height"))
+    );
+    height: min(
+        calc(80vw / v-bind("parsed.width")),
+        calc(80vh / v-bind("parsed.height"))
+    );
     background-color: white;
     border: 1px solid black;
     display: flex;
