@@ -13,6 +13,7 @@ export default class Game extends Model {
             start_time: this.attr(null), // ISO string assumed
             end_time: this.attr(null), // null if unfinished
             lastTurnIn: this.number(-1), // -1 <=> beginning of the game; no turns yet
+            lastTurnWon: this.boolean(false), // only true if the last update was a "GAME_OVER" message (lazy af but easiest to implement)
         };
     }
 

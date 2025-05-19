@@ -27,6 +27,7 @@ export function connectToSocket(gameId) {
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
+            console.log(`[WS] Received message: ${message.type}`); //TODO remove
             if (
                 ["GAME_UPDATED", "GUEST_JOINED"].includes(message.type) &&
                 message.game
@@ -37,6 +38,14 @@ export function connectToSocket(gameId) {
                 store.dispatch("gameLoader/insertGame", {
                     ...message.game,
                     lastTurnIn: message.turnIn,
+                });
+            }
+            if ("GAME_OVER" === message.type) {
+                console.log(`[WS] Game over: ${message.gameId}`);
+                store.dispatch("gameLoader/insertGame", {
+                    ...message.game,
+                    lastTurnIn: message.turnIn,
+                    lastTurnWon: true,
                 });
             }
         } catch (err) {
