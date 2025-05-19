@@ -40,7 +40,11 @@
         </v-list>
 
         <!-- Create Game Dialog -->
-        <v-dialog v-model="open_dialog" max-width="400">
+        <v-dialog
+            v-model="open_dialog"
+            max-width="400"
+            @keydown.enter.prevent="create_game"
+        >
             <v-card>
                 <v-card-title>Create New Game</v-card-title>
                 <v-card-text>

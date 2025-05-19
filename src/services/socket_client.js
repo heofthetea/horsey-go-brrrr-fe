@@ -1,6 +1,6 @@
 import store from "@/store";
 import Game from "@/store/models/Game";
-import { getToken } from "../plugins/keycloak";
+import keycloak from "../plugins/keycloak";
 
 const connections = new Map(); // maps gameId => WebSocket
 
@@ -16,11 +16,9 @@ export function connectToSocket(gameId) {
         return; // already connected
     }
 
-    const url = `${import.meta.env.VITE_API_BASE_URL.replace(
-        /^http/,
-        "ws"
-    )}/ws/game/${gameId}`;
-    const ws = new WebSocket(url, ["access_token", getToken()]);
+    const url = `${import.meta.env.VITE_WEBSOCKET_URL}/game/${gameId}`;
+    // shouldn't need to refresh the token here
+    const ws = new WebSocket(url, ["access_token", keycloak.token]);
 
     ws.onopen = () => {
         console.log(`[WS] Connected to game ${gameId}`);
