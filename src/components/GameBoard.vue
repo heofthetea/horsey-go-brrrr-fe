@@ -263,6 +263,7 @@ async function handle_click(col) {
 }
 
 .cell {
+    /* Dynamically scale the cell size based on the available viewport. Should make the entire board visible at all times. */
     width: min(
         calc(80vw / v-bind("parsed.width")),
         calc(80vh / v-bind("parsed.height"))
