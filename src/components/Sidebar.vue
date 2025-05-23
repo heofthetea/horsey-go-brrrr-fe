@@ -48,16 +48,18 @@
             <v-card>
                 <v-card-title>Create New Game</v-card-title>
                 <v-card-text>
-                    <v-text-field
+                    <v-number-input
                         v-model="width"
                         label="Width"
-                        type="number"
+                        :min="4"
+                        :max="20"
                         required
                     />
-                    <v-text-field
+                    <v-number-input
                         v-model="height"
                         label="Height"
-                        type="number"
+                        :min="4"
+                        :max="20"
                         required
                     />
                 </v-card-text>

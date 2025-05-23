@@ -1,4 +1,14 @@
 <template>
+    <v-alert
+        v-if="lastTurnWon"
+        type="success"
+        class="mb-2"
+        style="width: fit-content"
+        closable
+    >
+        Someone just won lelol WHY CAN'T I PLAY THE AUDIO MAAAAANNNNN
+    </v-alert>
+
     <v-container
         class="pa-4 d-flex flex-column"
         style="width: fit-content"
@@ -76,7 +86,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
@@ -93,6 +103,8 @@ const props = defineProps({
 const store = useStore();
 const hover_col = ref(null);
 const dismissedBanner = ref(false);
+const username = getUsername();
+const horseAudio = new Audio("./horse.mp3");
 
 const state = computed(() => props.game.state);
 const host = computed(
@@ -105,6 +117,18 @@ const guest = computed(
         (props.game.guest?.username ?? "Waiting for players to join...") +
         (props.game.guest?.username === username ? " (you)" : "")
 );
+
+// check whether the game has just now been won
+// used to display the game over sound
+// the code is getting less and less beautiful over time
+const lastTurnWon = computed(() => {
+    if (props.game.lastTurnWon) {
+        console.warn("last turn won");
+        // props.game.lastTurnWon = false;
+        return true;
+    }
+    return false;
+});
 
 const isGameOver = computed(() =>
     ["HOST_WON", "GUEST_WON", "DRAW"].includes(state.value)
@@ -141,7 +165,6 @@ const winningCoordinates = computed(() => {
         state.value === "HOST_WON" ? "x" : "o"
     );
 });
-const username = getUsername();
 
 /**
  * Parses the JEN string into a format better suited for rendering.
@@ -181,6 +204,19 @@ const resultText = computed(() => {
             return "";
     }
 });
+
+watch(lastTurnWon, (won) => {
+    console.log("won", won);
+    if (won) {
+        horseAudio.play().catch((err) => {
+            console.error("Failed to play audio:", err);
+        });
+        props.game.lastTurnWon = false;
+    }
+});
+
+// -----------------------------------------------------------------------------
+// Functions (this layout is completely cooked)
 
 function find_lowest_free_cell(col) {
     if (!parsed.value) return null;
@@ -227,6 +263,7 @@ async function handle_click(col) {
 }
 
 .cell {
+    /* Dynamically scale the cell size based on the available viewport. Should make the entire board visible at all times. */
     width: min(
         calc(80vw / v-bind("parsed.width")),
         calc(80vh / v-bind("parsed.height"))
