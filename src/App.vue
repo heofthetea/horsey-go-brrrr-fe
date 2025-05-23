@@ -31,6 +31,40 @@
             >
                 {{ errorMessage }}
             </v-alert>
+            <v-alert
+                v-if="selected_game_id && socketStatus === 'disconnected'"
+                type="warning"
+                variant="tonal"
+                style="height: fit-content"
+            >
+                Disconnected from WebSocket. Trying to reconnect...
+            </v-alert>
+            <v-alert
+                v-if="selected_game_id && socketStatus === 'failed'"
+                type="error"
+                variant="tonal"
+                style="height: fit-content"
+            >
+                Failed to connect to WebSocket: Max retries exceeded. You can
+                probably blame Josia
+                <v-tooltip
+                    text="Well I wanted to write 'my deployment' but honestly
+                    blaming Josia is way more fun, thanks copilot"
+                    location="top"
+                >
+                    <template #activator="{ props }">
+                        <v-icon
+                            v-bind="props"
+                            class="ml-2"
+                            color="red"
+                            style="cursor: pointer"
+                        >
+                            mdi-help-circle
+                        </v-icon>
+                    </template>
+                </v-tooltip>
+                <br />
+            </v-alert>
             <v-container fluid class="h-100 d-flex justify-center align-center">
                 <GameBoard v-if="selected_game" :game="selected_game" />
             </v-container>
@@ -39,17 +73,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useStore } from "vuex";
 import Sidebar from "./components/Sidebar.vue";
 import GameBoard from "./components/GameBoard.vue";
 import { useRoute } from "vue-router";
-import { connectToSocket } from "./services/socket_client";
+import { connectToSocket, connectionStatus } from "./services/socket_client";
 
 const store = useStore();
 const route = useRoute();
 const selected_game_id = ref(null);
 const showSidebar = ref(true);
+
+const socketStatus = computed(
+    () => selected_game_id.value && connectionStatus[selected_game_id.value]
+);
 
 const errorMessage = computed(() => {
     return route.query.errorMessage;
