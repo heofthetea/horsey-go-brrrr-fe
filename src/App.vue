@@ -6,7 +6,7 @@
                 v-if="$vuetify.display.smAndDown"
             />
             <v-toolbar-title
-                >horsey-go-brrr - beat Josia edition</v-toolbar-title
+                >horsey-go-brrrr - beat Josia edition</v-toolbar-title
             >
         </v-app-bar>
 
