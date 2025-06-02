@@ -1,3 +1,7 @@
+## In loving Memory
+
+🪦 10.04.2025 Josia
+
 # horsey-go-brrrr-fe
 
 Frontend for the horsey-go-brrrr connect 4 game, using Vue.js and Vite.
