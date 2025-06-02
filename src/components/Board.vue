@@ -28,23 +28,32 @@
                         clickable:
                             find_lowest_free_cell(ci) === ri &&
                             is_my_turn &&
-                            !isGameOver,
+                            !isGameOver &&
+                            isLatestPosition,
                         hovered:
                             hover_col === ci &&
                             find_lowest_free_cell(ci) === ri &&
                             is_my_turn &&
-                            !isGameOver,
-                        lastTurn: lastTurnInY === ri && lastTurnIn === ci,
+                            !isGameOver &&
+                            isLatestPosition,
+                        lastTurn:
+                            lastTurnInY === ri &&
+                            lastTurnIn === ci &&
+                            isLatestPosition,
                         winning:
                             is_winning_coordinate(
                                 ci,
                                 parsed.board.length - 1 - ri
-                            ) && did_I_win,
+                            ) &&
+                            did_I_win &&
+                            isLatestPosition,
                         losing:
                             is_winning_coordinate(
                                 ci,
                                 parsed.board.length - 1 - ri
-                            ) && !did_I_win,
+                            ) &&
+                            !did_I_win &&
+                            isLatestPosition,
                     }"
                     @mouseenter="!isGameOver && (hover_col = ci)"
                     @mouseleave="hover_col = null"
@@ -62,7 +71,8 @@
                         v-else-if="
                             hover_col === ci &&
                             find_lowest_free_cell(ci) === ri &&
-                            is_my_turn
+                            is_my_turn &&
+                            isLatestPosition
                         "
                         :src="parsed.current_player === 'x' ? xSvg : oSvg"
                         class="mark faint"
@@ -72,6 +82,25 @@
             </div>
         </div>
         <div class="font-weight-bold mt-2">o: {{ guest }}</div>
+        <!-- Move history navigation -->
+        <div
+            class="container d-flex flex-row"
+            style="justify-content: space-between"
+        >
+            <img :src="leftArrowSvg" class="history" alt="<" @click="goLeft" />
+            <span
+                >Turn
+                {{
+                    props.game.positions.length - fuckingPositionFICKDICH
+                }}</span
+            >
+            <img
+                :src="rightArrowSvg"
+                class="history"
+                alt=">"
+                @click="goRight"
+            />
+        </div>
     </v-container>
 </template>
 
@@ -80,8 +109,12 @@ import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 import xSvg from "../assets/x.svg";
 import oSvg from "../assets/o.svg";
+import leftArrowSvg from "../assets/left-arrow.svg";
+import rightArrowSvg from "../assets/right-arrow.svg";
 import { getUsername } from "../plugins/keycloak";
 import getWinningCoordinates from "../utils/jenWinDetection";
+import { onMounted } from "vue";
+import { onUpdated } from "vue";
 
 const props = defineProps({
     game: {
@@ -92,6 +125,7 @@ const props = defineProps({
 
 const store = useStore();
 const hover_col = ref(null);
+const fuckingPositionFICKDICH = ref(1);
 const dismissedBanner = ref(false);
 const username = getUsername();
 const horseAudio = new Audio("./horse.mp3");
@@ -156,13 +190,22 @@ const winningCoordinates = computed(() => {
     );
 });
 
+const isLatestPosition = computed(() => fuckingPositionFICKDICH.value === 1);
+
 /**
  * Parses the JEN string into a format better suited for rendering.
  * Inverts the array so that the top-left cell is rendered bottom-left.
  * Also extracts the width, height, and current player.
  */
 const parsed = computed(() => {
-    const jen = props.game.currentPosition;
+    let jen =
+        props.game.positions[
+            props.game.positions.length - fuckingPositionFICKDICH.value
+        ]?.jen ?? props.game.currentPosition;
+    // allow player to move again if a move just occured
+    if (props.game.justMoved) {
+        fuckingPositionFICKDICH.value = 1;
+    }
     if (!jen || jen.length < 7) return null;
 
     const width = parseInt(jen.slice(0, 3), 10);
@@ -199,13 +242,16 @@ const resultText = computed(() => {
  * Play horse audio if someone won
  */
 watch(lastTurnWon, (won) => {
-    console.log("won", won);
     if (won) {
         horseAudio.play().catch((err) => {
             console.error("Failed to play audio:", err);
         });
         props.game.lastTurnWon = false;
     }
+});
+
+onUpdated(async () => {
+    await store.dispatch("gameLoader/fetchPositions", props.game);
 });
 
 // -----------------------------------------------------------------------------
@@ -240,6 +286,22 @@ async function handle_click(col) {
     } catch (err) {
         console.error("Failed to make move:", err);
     }
+}
+
+async function goLeft() {
+    await store.dispatch("gameLoader/fetchPositions", props.game);
+    fuckingPositionFICKDICH.value =
+        props.game.positions.length - fuckingPositionFICKDICH.value > 0
+            ? fuckingPositionFICKDICH.value + 1
+            : props.game.positions.length;
+}
+
+async function goRight() {
+    await store.dispatch("gameLoader/fetchPositions", props.game);
+    fuckingPositionFICKDICH.value =
+        fuckingPositionFICKDICH.value > 1
+            ? fuckingPositionFICKDICH.value - 1
+            : 1;
 }
 </script>
 
@@ -298,9 +360,20 @@ async function handle_click(col) {
     stroke: red !important;
 }
 
+.history {
+    border-radius: 0.5em;
+    width: 3em;
+}
+
+.history:hover {
+    cursor: pointer;
+    background: lightblue;
+}
+
 .faint {
     opacity: 0.3;
 }
+
 .alert-banner {
     position: sticky;
     text-align: center;

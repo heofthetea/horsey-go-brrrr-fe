@@ -4,6 +4,7 @@ import {
     make_turn,
     get_game,
     join_game,
+    fetch_positions,
 } from "@/services/game_service";
 import Game from "@/store/models/Game";
 import { getUsername } from "../plugins/keycloak";
@@ -34,11 +35,17 @@ export default {
         },
         async joinGame(_, { game_id, username }) {
             const joined = await join_game(game_id, username);
+            joined.justMoved = true;
             Game.insert({ data: joined });
             return joined;
         },
         async insertGame(_, game) {
             Game.insert({ data: game });
+        },
+        async fetchPositions(_, game) {
+            const positions = await fetch_positions(game.id);
+            game.positions = positions;
+            game.currentPosition = positions[positions.length - 1].jen;
         },
     },
 };

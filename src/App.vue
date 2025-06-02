@@ -63,6 +63,7 @@
                         </v-icon>
                     </template>
                 </v-tooltip>
+                Try reloading the page.
                 <br />
             </v-alert>
             <v-container fluid class="h-100 d-flex justify-center align-center">
@@ -103,7 +104,7 @@ const join_link = computed(() => {
     return `${window.location.origin}/join/${selected_game_id.value}`;
 });
 
-onMounted(() => {
+onMounted(async () => {
     if (route.query.errorMessage) {
         console.error(errorMessage);
         return;
@@ -114,9 +115,9 @@ onMounted(() => {
     }
 });
 
-function handle_game_select(id) {
+async function handle_game_select(id) {
     selected_game_id.value = id;
-    connectToSocket(id);
+    await connectToSocket(id);
 }
 </script>
 
