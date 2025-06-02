@@ -252,7 +252,6 @@ watch(lastTurnWon, (won) => {
 
 onUpdated(async () => {
     await store.dispatch("gameLoader/fetchPositions", props.game);
-    console.log(props.game.positions);
 });
 
 // -----------------------------------------------------------------------------
