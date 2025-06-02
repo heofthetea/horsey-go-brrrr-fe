@@ -49,33 +49,33 @@ The root directory mostly holds miscellaneous files. All Vue source code is loca
 
 ```tree
 ├── src
-│   ├── App.vue
-│   ├── assets
-│   │   ├── o.svg
-│   │   └── x.svg
-│   ├── components
-│   │   ├── Board.vue
-│   │   └── Sidebar.vue
-│   ├── Index.vue
-│   ├── main.js
-│   ├── pages
-│   │   └── JoinGame.vue
-│   ├── plugins
-│   │   ├── keycloak.js
-│   │   └── vuetify.js
-│   ├── router
-│   │   ├── index.js
-│   │   └── keycloakGuard.js
-│   ├── services
-│   │   ├── api.js
-│   │   ├── game_service.js
-│   │   └── socket_client.js
-│   ├── store
-│   │   ├── gameLoader.js
-│   │   ├── index.js
-│   │   └── models
-│   └── utils
-│       └── jenWinDetection.js
+    ├── App.vue
+    ├── assets
+    │   ├── o.svg
+    │   └── x.svg
+    ├── components
+    │   ├── Board.vue
+    │   └── Sidebar.vue
+    ├── Index.vue
+    ├── main.js
+    ├── pages
+    │   └── JoinGame.vue
+    ├── plugins
+    │   ├── keycloak.js
+    │   └── vuetify.js
+    ├── router
+    │   ├── index.js
+    │   └── keycloakGuard.js
+    ├── services
+    │   ├── api.js
+    │   ├── game_service.js
+    │   └── socket_client.js
+    ├── store
+    │   ├── gameLoader.js
+    │   ├── index.js
+    │   └── models
+    └── utils
+        └── jenWinDetection.js
 ```
 
 The top-most component is `Index.vue`, holding a `RouterView` to enable internal routing to the `/join/*` route.<br>
