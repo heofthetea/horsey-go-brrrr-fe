@@ -55,3 +55,11 @@ export async function join_game(game_id, username) {
     }
     return response.data;
 }
+
+export async function fetch_positions(game_id) {
+    const response = await api.get(`/games/${game_id}/history`);
+    if (!response.status === 200) {
+        throw new Error("Failed to fetch game history", response.status);
+    }
+    return response.data;
+}

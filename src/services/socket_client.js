@@ -24,7 +24,7 @@ export function isConnected(gameId) {
  * @param {*} gameId id of the game, used to connect to the corresponding websocket
  * @returns {void}
  */
-export function connectToSocket(gameId) {
+export async function connectToSocket(gameId) {
     if (connections.has(gameId)) {
         return; // already connected
     }
@@ -52,6 +52,7 @@ export function connectToSocket(gameId) {
                 store.dispatch("gameLoader/insertGame", {
                     ...message.game,
                     lastTurnIn: message.turnIn,
+                    justMoved: true,
                 });
             }
             // case is treated seperately so that horse sound can be played
@@ -61,6 +62,7 @@ export function connectToSocket(gameId) {
                     ...message.game,
                     lastTurnIn: message.turnIn,
                     lastTurnWon: true,
+                    justMoved: true,
                 });
             }
         } catch (err) {
@@ -92,7 +94,6 @@ export function connectToSocket(gameId) {
         }
 
         const retries = retryCounts.get(gameId) || 0;
-        console.log(retries);
         if (retries >= MAX_RETRIES) {
             console.error(
                 `[WS] Max retries reached for game ${gameId}. Not reconnecting.`
