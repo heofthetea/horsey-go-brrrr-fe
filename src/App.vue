@@ -66,7 +66,7 @@
                 <br />
             </v-alert>
             <v-container fluid class="h-100 d-flex justify-center align-center">
-                <GameBoard v-if="selected_game" :game="selected_game" />
+                <Board v-if="selected_game" :game="selected_game" />
             </v-container>
         </v-main>
     </v-app>
@@ -76,7 +76,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useStore } from "vuex";
 import Sidebar from "./components/Sidebar.vue";
-import GameBoard from "./components/GameBoard.vue";
+import Board from "./components/Board.vue";
 import { useRoute } from "vue-router";
 import { connectToSocket, connectionStatus } from "./services/socket_client";
 

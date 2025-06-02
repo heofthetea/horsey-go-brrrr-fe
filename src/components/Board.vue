@@ -1,22 +1,11 @@
 <template>
-    <v-alert
-        v-if="lastTurnWon"
-        type="success"
-        class="mb-2"
-        style="width: fit-content"
-        closable
-    >
-        Someone just won lelol WHY CAN'T I PLAY THE AUDIO MAAAAANNNNN
-    </v-alert>
-
     <v-container
         class="pa-4 d-flex flex-column"
         style="width: fit-content"
         fluid
     >
-        <!-- Player X -->
         <div class="font-weight-bold mb-2">x: {{ host }}</div>
-        <!-- Banner -->
+        <!-- Result Banner -->
         <v-alert
             v-if="isGameOver && !dismissedBanner"
             type="info"
@@ -27,7 +16,9 @@
         >
             {{ resultText }}
         </v-alert>
+
         <div class="board">
+            <!--row-->
             <div v-for="(row, ri) in parsed.board" :key="ri" class="board-row">
                 <div
                     v-for="(cell, ci) in row"
@@ -80,7 +71,6 @@
                 </div>
             </div>
         </div>
-        <!-- Player O -->
         <div class="font-weight-bold mt-2">o: {{ guest }}</div>
     </v-container>
 </template>
@@ -119,12 +109,11 @@ const guest = computed(
 );
 
 // check whether the game has just now been won
-// used to display the game over sound
+// used to play the horse sound
 // the code is getting less and less beautiful over time
 const lastTurnWon = computed(() => {
     if (props.game.lastTurnWon) {
         console.warn("last turn won");
-        // props.game.lastTurnWon = false;
         return true;
     }
     return false;
@@ -195,9 +184,9 @@ const parsed = computed(() => {
 const resultText = computed(() => {
     switch (state.value) {
         case "HOST_WON":
-            return "x won!";
+            return `x (${props.game.host.username}) won!`;
         case "GUEST_WON":
-            return "o won!";
+            return `o (${props.game.guest.username}) won!`;
         case "DRAW":
             return "Draw!";
         default:
@@ -205,6 +194,9 @@ const resultText = computed(() => {
     }
 });
 
+/**
+ * Play horse audio if someone won
+ */
 watch(lastTurnWon, (won) => {
     console.log("won", won);
     if (won) {
@@ -216,7 +208,7 @@ watch(lastTurnWon, (won) => {
 });
 
 // -----------------------------------------------------------------------------
-// Functions (this layout is completely cooked)
+// Functions (this component layout is completely cooked)
 
 function find_lowest_free_cell(col) {
     if (!parsed.value) return null;

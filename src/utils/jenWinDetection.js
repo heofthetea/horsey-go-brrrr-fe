@@ -1,12 +1,13 @@
 /**
  * Given a JEN string and knowledge about the player who won,
- * calculate the positions that led to this win.
+ * calculate the cells that contribute to this win.
  * Yes I know this is mostly a duplicate of the win detection code in the backend. Duplication
- * is a deliberate decision in order to not clutter the backend and database with makeshift board representations,
- * and to avoid re-factoring. Boards are small enough thath O(n^2) really shouldn't be a problem.
+ * is a deliberate decision in order to not clutter the backend or database with makeshift board representations
+ * and not having to refactor the entire JSON communication (which would be a horrible time-vs-use tradeoff).
+ * Boards are small enough that running O(n^2) twice isn't a practical problem.
  * @param {*} jen a jen string
  * @param {*} player the symbol of the player who won
- * @returns
+ * @returns {Array} an Array containing 4 coordinate tupels representing the winning squares, or null if no win was found
  */
 
 export default function getWinningCoordinates(jen, player) {

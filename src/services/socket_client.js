@@ -1,5 +1,9 @@
+/**
+ * Provides a function to create WebSockets.
+ * Defines the WebSockets behaviour and registers it with the API
+ */
+
 import store from "@/store";
-import Game from "@/store/models/Game";
 import keycloak from "../plugins/keycloak";
 import { reactive } from "vue";
 
@@ -14,11 +18,11 @@ export function isConnected(gameId) {
 }
 
 /**
- * Connect to a WebSocket server for the given gameId.
+ * Connect to a WebSocket for the given gameId.
  * Defines standard WebSocket callbacks for onopen, onmessage, onerror, and onclose.
  * Incoming messages lead to an update of the orm store.
- * @param {*} gameId
- * @returns
+ * @param {*} gameId id of the game, used to connect to the corresponding websocket
+ * @returns {void}
  */
 export function connectToSocket(gameId) {
     if (connections.has(gameId)) {
@@ -32,13 +36,12 @@ export function connectToSocket(gameId) {
     ws.onopen = () => {
         console.log(`[WS] Connected to game ${gameId}`);
         connectionStatus[gameId] = "connected";
-        retryCounts.set(gameId, 0);
+        retryCounts.set(gameId, 0); // reset counter on successfull connection only
     };
 
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
-            console.log(`[WS] Received message: ${message.type}`); //TODO remove
             if (
                 ["GAME_UPDATED", "GUEST_JOINED"].includes(message.type) &&
                 message.game
@@ -51,6 +54,7 @@ export function connectToSocket(gameId) {
                     lastTurnIn: message.turnIn,
                 });
             }
+            // case is treated seperately so that horse sound can be played
             if ("GAME_OVER" === message.type) {
                 console.log(`[WS] Game over: ${message.gameId}`);
                 store.dispatch("gameLoader/insertGame", {

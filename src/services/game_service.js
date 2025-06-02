@@ -1,4 +1,6 @@
-// API communication for game
+/**
+ * Provides services requiring communication with the API
+ */
 import api from "@/services/api";
 
 export async function get_games_by_user(username) {

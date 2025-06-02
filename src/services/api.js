@@ -1,4 +1,6 @@
-// axios instance for API calls
+/**
+ * Provides an axios instance to handle API calls
+ */
 import axios from "axios";
 import keycloak from "@/plugins/keycloak";
 
