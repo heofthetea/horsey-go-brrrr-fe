@@ -125,11 +125,12 @@ const isGameOver = computed(() =>
 
 const is_my_turn = computed(() => {
     if (props.game.guest === null) return false;
-    if (props.game.guest.username === username) {
-        return parsed.value.current_player === "o";
-    } else {
-        return parsed.value.current_player === "x";
-    }
+    return (
+        (parsed.value.current_player === "x" &&
+            props.game.host.username === username) ||
+        (parsed.value.current_player === "o" &&
+            props.game.guest.username === username)
+    );
 });
 
 const did_I_win = computed(() => {
