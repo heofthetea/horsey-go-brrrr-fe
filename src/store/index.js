@@ -1,4 +1,4 @@
-import { createStore } from "vuex"; // YES IT DOES SHUT UP VSCODE
+import { createStore } from "vuex"; // YES IT DOES EXPOSE 'vuex' SHUT UP VSCODE
 import VuexORM from "@vuex-orm/core";
 import { Database } from "@vuex-orm/core";
 import Game from "./models/Game";

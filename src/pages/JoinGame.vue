@@ -1,4 +1,8 @@
-<template>Make team 2 great again</template>
+<template>
+    Make team 2 great again<br />
+    If you see this too long, something went wrong when trying to join you to a
+    game
+</template>
 
 <script setup>
 import { onMounted } from "vue";

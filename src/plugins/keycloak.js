@@ -1,3 +1,7 @@
+/**
+ * Configure the Keycloak plugin for seemless identity provider integration.
+ */
+
 import Keycloak from "keycloak-js";
 
 const keycloak = new Keycloak({

@@ -1,4 +1,6 @@
-// API communication for game
+/**
+ * Provides services requiring communication with the API
+ */
 import api from "@/services/api";
 
 export async function get_games_by_user(username) {
@@ -28,10 +30,7 @@ export async function create_game(username, width, height) {
 }
 
 export async function make_turn(game_id, username, column) {
-    const payload = {
-        user: { username },
-        column,
-    };
+    const payload = column;
 
     const response = await api.put(`/games/${game_id}/make-turn`, payload);
     if (!response.status === 200) {
